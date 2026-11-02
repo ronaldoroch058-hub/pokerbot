@@ -64,7 +64,6 @@ NAMES = {"fold": "FOLD", "check": "CHECK", "call": "CALL", "bet1": "BET", "bet2"
 
 class Monte(Bot):
     name = "MONTE"
-    blurb = "Monte Carlo equity, then dickreuter's call/bet limit curves."
 
     def __init__(self, strategy=None):
         self.p = dict(DEFAULT, **(strategy or {}))

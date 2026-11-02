@@ -15,6 +15,7 @@ It's an approximation stacked on an approximation, but it mixes its actions
 and balances bluffs on its own, which none of the hand-tuned bots do.
 """
 
+import functools
 import json
 import math
 import os
@@ -104,6 +105,24 @@ def all_nodes(root):
     return out
 
 
+def terminal_values(n, reach_opp, me, W):
+    """Leaf value for `me`, one entry per own bucket, weighted by the opponent's reach."""
+    c = n.c
+    pot = 1 + c[0] + c[1]
+    if n.kind == "fold":
+        u = (pot - c[me]) if n.folder != me else -c[me]
+        return [u * sum(reach_opp)] * B
+    out = []
+    for i in range(B):
+        acc = 0.0
+        for j in range(B):
+            if reach_opp[j]:
+                w = W[i][j] if me == 0 else 1.0 - W[j][i]
+                acc += reach_opp[j] * (w * pot - c[me])
+        out.append(acc)
+    return out
+
+
 class Solver:
     """CFR+ with alternating updates, values carried as per-bucket vectors."""
 
@@ -121,29 +140,9 @@ class Solver:
             out.append([r / s for r in row] if s > 0 else [1.0 / len(row)] * len(row))
         return out
 
-    def terminal(self, n, reach_opp, me):
-        W = self.W
-        c = n.c
-        pot = 1 + c[0] + c[1]
-        if n.kind == "fold":
-            # winner collects the pot; values are per bucket, weighted by opp reach
-            win = n.folder != me
-            u = (pot - c[me]) if win else -c[me]
-            tot = sum(reach_opp)
-            return [u * tot] * B
-        out = []
-        for i in range(B):
-            acc = 0.0
-            for j in range(B):
-                if reach_opp[j]:
-                    w = W[i][j] if me == 0 else 1.0 - W[j][i]
-                    acc += reach_opp[j] * (w * pot - c[me])
-            out.append(acc)
-        return out
-
     def walk(self, n, me, reach_me, reach_opp, t):
         if n.kind != "decision":
-            return self.terminal(n, reach_opp, me)
+            return terminal_values(n, reach_opp, me, self.W)
         strat = self.current(n)
         k = len(n.actions)
         if n.player == me:
@@ -195,13 +194,7 @@ def exploitability(policy, noise):
 
     def br(n, me, reach_opp):
         if n.kind != "decision":
-            c = n.c
-            pot = 1 + c[0] + c[1]
-            if n.kind == "fold":
-                u = (pot - c[me]) if n.folder != me else -c[me]
-                return [u * sum(reach_opp)] * B
-            return [sum(reach_opp[j] * ((W[i][j] if me == 0 else 1 - W[j][i]) * pot - c[me]) for j in range(B))
-                    for i in range(B)]
+            return terminal_values(n, reach_opp, me, W)
         if n.player == me:
             vals = [br(kid, me, reach_opp) for kid in n.kids]
             return [max(v[i] for v in vals) for i in range(B)]
@@ -235,18 +228,13 @@ def solve_all(iters=ITERS, verbose=False):
     return out
 
 
-_policy = None
-
-
+@functools.cache
 def policy():
-    global _policy
-    if _policy is None:
-        try:
-            with open(CACHE) as f:
-                _policy = json.load(f)
-        except FileNotFoundError:
-            _policy = solve_all()
-    return _policy
+    try:
+        with open(CACHE) as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return solve_all()
 
 
 # ---------------------------------------------------------------- at the table
@@ -272,7 +260,6 @@ def translate(frac, rng):
 
 class CFR7(Bot):
     name = "CFR-7"
-    blurb = "Solves a 7-bucket toy game per street with CFR+, then plays the mix."
 
     def __init__(self):
         self.pol = policy()
@@ -335,13 +322,7 @@ class CFR7(Bot):
         think.append(f"> BUCKET {bucket + 1}/7 NODE /{path or '-'}")
         think.append("> MIX " + " ".join(f"{a.upper()}{dec(p)}" for a, p in zip(acts, sigma)))
 
-        x = v.rng.random()
-        pick = acts[-1]
-        for a, p in zip(acts, sigma):
-            x -= p
-            if x < 0:
-                pick = a
-                break
+        pick = v.rng.choices(acts, weights=sigma)[0]
         think.append(f"> PICK {WORD[pick]}")
 
         if pick in ("x", "c"):

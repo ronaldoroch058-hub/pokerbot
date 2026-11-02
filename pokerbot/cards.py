@@ -5,8 +5,6 @@ RANKS = "23456789TJQKA"
 SUITS = "cdhs"
 GLYPH = {"c": "♣", "d": "♦", "h": "♥", "s": "♠"}
 
-DECK = tuple(range(52))
-
 
 def rank(c):
     return c >> 2
@@ -73,8 +71,6 @@ def class_combos(key):
 def example_hand(key):
     """Any concrete hole cards for a class key, for building tables."""
     hi, lo = RANKS.index(key[0]), RANKS.index(key[1])
-    if hi == lo:
-        return [hi << 2 | 0, lo << 2 | 1]
-    if key[2] == "s":
-        return [hi << 2 | 0, lo << 2 | 0]
-    return [hi << 2 | 0, lo << 2 | 1]
+    if key.endswith("s"):
+        return [hi << 2, lo << 2]
+    return [hi << 2, lo << 2 | 1]  # pairs and offsuit: clubs + diamonds

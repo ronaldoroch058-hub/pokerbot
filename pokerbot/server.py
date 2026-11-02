@@ -80,8 +80,8 @@ class App:
 
     def collect(self):
         fresh = []
+        counted = 0  # hands since the last stats tick, for hands/sec
         last_book = last_stats = time.monotonic()
-        window = deque()  # arrival times, for hands/sec
         while True:
             try:
                 seats, ln = self.q.get(timeout=0.1)
@@ -95,17 +95,16 @@ class App:
                 with self.book_lock:
                     self.book.append(ln)
                 fresh.append(ln)
-                window.append(now)
+                counted += 1
 
-            while window and now - window[0] > 5:
-                window.popleft()
             if now - last_book >= 0.25:
-                self.hps = len(window) / 5
                 if fresh:
                     self.hub.publish("book", {"lines": fresh, "hps": round(self.hps, 1)})
                     fresh = []
                 last_book = now
             if now - last_stats >= 1.0:
+                self.hps = counted / (now - last_stats)
+                counted = 0
                 self.hub.publish("stats", self.stats_json())
                 last_stats = now
 

@@ -37,22 +37,16 @@ def _top_bits(mask, n):
     return out
 
 
-STRAIGHT_HIGH = [_straight_high(m) for m in range(8192)]
-# five highest ranks of a mask, already packed into 20 bits
-TOP5 = []
-for _m in range(8192):
-    v = 0
-    for _r in _top_bits(_m, 5):
-        v = v << 4 | _r
-    TOP5.append(v << 4 * (5 - min(5, _m.bit_count())))
-del _m, _r
-
-
 def _pack(*ranks):
     v = 0
     for r in ranks:
         v = v << 4 | r
     return v << 4 * (5 - len(ranks))
+
+
+STRAIGHT_HIGH = [_straight_high(m) for m in range(8192)]
+# five highest ranks of a mask, already packed into 20 bits
+TOP5 = [_pack(*_top_bits(m, 5)) for m in range(8192)]
 
 
 def evaluate(cs):
@@ -111,10 +105,6 @@ def evaluate(cs):
         rest = TOP5[mask & ~(1 << pair)] >> 8
         return PAIR << 20 | pair << 16 | rest << 4
     return TOP5[mask]
-
-
-def category(value):
-    return value >> 20
 
 
 def describe(value):

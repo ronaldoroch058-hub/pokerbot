@@ -23,7 +23,6 @@ VALUE_CUT = [None, 0.70, 0.73, 0.76]
 
 class Nash(Bot):
     name = "NASH"
-    blurb = "Polarised bets at the indifference ratio, defends to MDF, geometric sizing."
 
     def act(self, v):
         think = []

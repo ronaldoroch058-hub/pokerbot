@@ -1,3 +1,4 @@
+import functools
 import json
 import os
 import random
@@ -8,19 +9,15 @@ from .evaluator import evaluate
 DATA = os.path.join(os.path.dirname(__file__), "data")
 PREFLOP_FILE = os.path.join(DATA, "preflop.json")
 
-_preflop = None
 
-
+@functools.cache
 def preflop_table():
     """{class: {"eq": [vs1..vs7], "pct": percentile 0..1}} - built by `python -m pokerbot tables`."""
-    global _preflop
-    if _preflop is None:
-        try:
-            with open(PREFLOP_FILE) as f:
-                _preflop = json.load(f)
-        except FileNotFoundError:
-            raise SystemExit("data/preflop.json missing, run: python3 -m pokerbot tables")
-    return _preflop
+    try:
+        with open(PREFLOP_FILE) as f:
+            return json.load(f)
+    except FileNotFoundError:
+        raise SystemExit("data/preflop.json missing, run: python3 -m pokerbot tables")
 
 
 def preflop_equity(hole, n_opp):
@@ -120,8 +117,7 @@ def build_preflop_table(iters=4000, workers=None):
     os.makedirs(DATA, exist_ok=True)
     with open(PREFLOP_FILE, "w") as f:
         json.dump(table, f, separators=(",", ":"))
-    global _preflop
-    _preflop = table
+    preflop_table.cache_clear()
     return table
 
 
