@@ -1,0 +1,120 @@
+:root {
+  --ink: #111;
+  --paper: #fff;
+  --gutter: #8a8a8a;
+  --faint: #cacaca;
+  --muted: #5a5a5a;
+  --mono: "Source Code Pro", ui-monospace, Menlo, Consolas, monospace;
+  --lh: 1.8;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 15px/var(--lh) var(--mono);
+}
+a { color: inherit; }
+b, strong, h1, h2, h3, th, legend { font-weight: 400; }
+h1, h2, h3 { font: inherit; margin: 0; }
+button { font: inherit; color: inherit; }
+
+/* the page is one long numbered printout */
+.doc { counter-reset: ln; padding-top: 48px; }
+.sheet { max-width: 96ch; margin: 0 auto; padding: 0 24px 0 64px; }
+.l {
+  counter-increment: ln; position: relative; min-height: calc(var(--lh) * 1em);
+  display: flex; flex-wrap: wrap; justify-content: space-between; column-gap: 2ch;
+}
+.l::before {
+  content: counter(ln); position: absolute; left: -5ch; width: 3.2ch; top: .55em;
+  text-align: right; font-size: 10px; line-height: 1; color: var(--gutter);
+}
+.c { justify-content: center; text-align: center; }
+.gap { margin-top: .5em; }
+.up { text-transform: uppercase; }
+.dim { color: var(--muted); }
+.rule > span { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; }
+.rule > span::before { content: "========================================================================================================================================================================================================"; }
+
+.chip {
+  display: inline-block; border: 1px solid var(--ink); padding: 0 1.5ch; margin: -1px 0;
+  text-decoration: none; background: var(--ink); color: var(--paper);
+}
+.chip .arr { display: inline-block; margin-left: 1.5ch; }
+a.chip:hover .arr { animation: bob .7s ease-in-out infinite alternate; }
+@keyframes bob { to { transform: translateY(4px); } }
+
+.roster { display: grid; grid-template-columns: 10ch 1fr 16ch; column-gap: 2ch; }
+.roster > :last-child { text-align: right; }
+
+/* black panels: the bots play in here */
+.screen {
+  color-scheme: dark;
+  --ink: #f2f2f2; --paper: #0a0a0a; --gutter: #757575; --faint: #3c3c3c; --muted: #a5a5a5;
+  background: var(--paper); color: var(--ink);
+  padding: calc(var(--lh) * 1em) 0;
+}
+
+/* text buttons: [PAUSE] 1x 4x ... */
+button.t {
+  background: none; border: 0; padding: 0 .5ch; cursor: pointer; line-height: inherit;
+}
+button.t:hover { outline: 1px solid var(--ink); outline-offset: -1px; }
+button.t:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+button.t[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+button.t:disabled { color: var(--muted); cursor: default; outline: 0; }
+
+/* cards */
+.cd {
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  width: 26px; height: 36px; border: 1px solid var(--ink); border-radius: 3px;
+  background: var(--paper); color: var(--ink); box-shadow: 1px 1px 0 var(--ink);
+  font-size: 11px; line-height: 1;
+}
+.cd i { font-style: normal; font-size: 12px; }
+.cd.slot { border: 1px dashed var(--faint); box-shadow: none; background: none; }
+.cd.back { background: repeating-linear-gradient(45deg, var(--ink) 0 1px, var(--paper) 1px 4px); }
+.cd.mini { width: auto; height: auto; flex-direction: row; padding: 0 .4ch; gap: 0; border-radius: 2px; box-shadow: none; font-size: 11px; line-height: 1.5; }
+.cd.mini i { font-size: 11px; }
+
+/* ---- exhibit E: the opening book */
+.legend { color: var(--muted); white-space: pre-wrap; }
+.book .tree-fig { margin: .5em 0; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; }
+.book svg { display: block; }
+.book svg text { font-family: var(--mono); fill: var(--ink); }
+.book .e { fill: none; stroke: var(--ink); stroke-linecap: round; }
+.book .more { fill: none; stroke: var(--muted); stroke-dasharray: 1 2.5; }
+.book .dot { fill: var(--ink); }
+.book .ch { fill: var(--paper); stroke: var(--ink); stroke-width: 1; }
+.book .bx { stroke: var(--ink); stroke-width: 1; fill: var(--paper); }
+.book .bx.sd { fill: var(--ink); }
+.book .lb { fill: var(--paper); }
+.book .pc, .book .mt { fill: var(--muted); font-size: 9px; }
+.book .wall path { fill: none; stroke: var(--ink); stroke-width: 1; }
+.book .wall text { font-size: 10px; }
+.book .hl .lb { fill: var(--ink); }
+.book .hl .lt { fill: var(--paper); }
+.book .hl .ch { stroke-width: 2; }
+.book .num { display: inline-block; min-width: 6ch; text-align: right; }
+.book .glyph { display: inline-block; width: 12px; height: 12px; vertical-align: -1px; margin-right: .5ch; }
+.book .ro { flex-wrap: nowrap; justify-content: flex-start; }
+.book .ro > .k { flex: none; width: 9ch; color: var(--muted); }
+.book .ro > .v { flex: 1 1 auto; min-width: 0; }
+.mrow { display: inline-flex; gap: 3px; align-items: center; }
+.mcards { justify-content: flex-start; column-gap: 1ch; }
+.mcards .lbl { color: var(--muted); }
+
+/* ---- notes */
+.notes .a > span { max-width: 72ch; text-transform: uppercase; }
+.notes { padding-bottom: calc(var(--lh) * 3em); }
+
+@media (max-width: 680px) {
+  body { font-size: 13px; }
+  .sheet { padding: 0 16px 0 40px; }
+  .l::before { left: -4ch; }
+  .roster { grid-template-columns: 8ch 1fr; }
+  .roster > :last-child { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before { animation: none !important; transition: none !important; }
+}

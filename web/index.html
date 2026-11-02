@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bot Room: Opening Book</title>
+<meta name="description" content="Three poker bots play each other nonstop; every hand is merged into one live opening book.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath fill='%23111' d='M3 1h10v14H3z'/%3E%3Cpath fill='%23fff' d='M4 2h8v12H4z'/%3E%3Cpath fill='%23111' d='M7 4h2v1h1v1h1v2H9v1H7V8H5V6h1V5h1zM7 10h2v2H7z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="doc">
+<div class="sheet">
+  <div class="l"><span>THE BOT ROOM</span></div>
+  <div class="l"><span>NO-LIMIT HOLD'EM, 6 SEATS, BLINDS 50/100</span></div>
+  <div class="l"><span>STACKS 10,000, RESET EVERY HAND</span></div>
+  <div class="l"></div>
+  <div class="l"><h1 class="chip">AN OPENING BOOK, WRITTEN LIVE BY THREE POKER BOTS</h1></div>
+  <div class="l"></div>
+  <div class="l up"><span>CFR-7, MONTE and NASH play each other nonstop in the back room. Every hand they finish goes into the tree below the moment it ends, so the book is always the last 10,000 hands they actually played.</span></div>
+  <div class="l"></div>
+  <div class="l"></div>
+  <div class="l c gap"><span>THE ROSTER</span></div>
+  <div class="l roster"><span>BOT</span><span>METHOD</span><span>RECORD</span></div>
+  <div class="l roster"><span>CFR-7</span><span>COUNTERFACTUAL REGRET, 7 BUCKETS</span><span id="rec-CFR-7">--</span></div>
+  <div class="l roster"><span>MONTE</span><span>MONTE CARLO EQUITY, LIMIT CURVES</span><span id="rec-MONTE">--</span></div>
+  <div class="l roster"><span>NASH</span><span>POT ODDS, MDF, POLARISED BETS</span><span id="rec-NASH">--</span></div>
+  <div class="l"></div>
+  <div class="l rule" aria-hidden="true"><span></span></div>
+  <div class="l"></div>
+  <div class="l"><span><a class="chip" href="#book">READ THE BOOK<span class="arr" aria-hidden="true">&darr;</span></a></span><span class="dim" id="conn">CONNECTING&hellip;</span></div>
+  <div class="l"></div>
+</div>
+
+<div class="screen">
+<div class="sheet">
+  <section class="book" id="book" aria-labelledby="bk-title">
+    <div class="l c gap"><h2 id="bk-title">EXHIBIT E: OPENING BOOK OF 10,000 HANDS</h2></div>
+    <div class="l"><span>6 SEATS, 3 BOTS, EVERY HAND MERGED INTO ONE TREE</span><span>LIVE FROM THE BACK ROOM</span></div>
+    <div class="l"><span>HANDS ADDED: <span class="num" id="bk-hands">0</span></span><span>HANDS/SEC: <span class="num" id="bk-hps">0</span></span></div>
+    <div class="l"><span>IN THE BOOK: <span class="num" id="bk-held">0</span> OF 10,000 MAX</span><span>DISTINCT LINES: <span class="num" id="bk-lines">0</span></span></div>
+    <div class="l"><span>BOOK</span><span><button class="t" id="bk-first" title="Empty the book">[|&lt;]</button><button class="t" id="bk-prev" title="Take the last hand back out">[&lt;]</button><button class="t" id="bk-play">[PAUSE]</button><button class="t" id="bk-next" title="Add one hand">[&gt;]</button> SPEED
+      <button class="t" data-speed="1">1x</button><button class="t" data-speed="4">4x</button><button class="t" data-speed="8">8x</button><button class="t" data-speed="16">16x</button></span></div>
+    <div class="l"><span>LABEL BY</span><span><button class="t" data-by="p">POSITION</button><button class="t" data-by="b">BOT</button></span></div>
+    <figure class="tree-fig" id="bk-fig"><svg id="bk-tree" aria-label="Every hand merged into one tree of action lines"></svg></figure>
+    <div class="l"><span id="bk-note">READ LEFT TO RIGHT FROM THE WALL</span><span>FOLDS COUNTED, NOT DRAWN: <span class="num" id="bk-folds">0</span></span></div>
+    <div class="l"><span class="legend"><svg class="glyph" viewBox="0 0 12 12"><rect x="3" y="1" width="6" height="10" fill="currentColor"/></svg>SHOWDOWN <svg class="glyph" viewBox="0 0 12 12"><rect x="3.5" y="1.5" width="5" height="9" fill="none" stroke="currentColor"/></svg>ALL FOLDED <svg class="glyph" viewBox="0 0 12 12"><circle cx="6" cy="6" r="3.5" fill="none" stroke="currentColor"/></svg>NEW CARDS</span><span class="legend">C CALL X CHECK B BET R RAISE A ALL-IN</span></div>
+    <div class="l"></div>
+    <div class="l ro"><span class="k">MAIN</span><span class="v" id="bk-main">&nbsp;</span></div>
+    <div class="l"></div>
+    <div class="l c"><span>LAST HAND, HIGHLIGHTED</span></div>
+    <div class="l"><span id="bk-lastNo">NO HANDS YET</span><span id="bk-lastRes"></span></div>
+    <div class="l mcards"><span class="lbl">BOARD</span><span class="mrow" id="bk-board"></span><span class="lbl">WINNER</span><span class="mrow" id="bk-win"></span></div>
+    <div class="l ro"><span class="k">LINE</span><span class="v" id="bk-line">&nbsp;</span></div>
+  </section>
+  <div class="l"></div>
+</div>
+</div>
+
+<div class="sheet notes">
+  <section aria-labelledby="notes-title">
+    <div class="l"></div>
+    <div class="l"></div>
+    <div class="l c gap"><h2 id="notes-title">NOTES</h2></div>
+    <div class="l"></div>
+    <div class="l q"><h3>HOW DO I READ THE TREE?</h3></div>
+    <div class="l a"><span>Start at the wall and go right. Each branch is one action by one seat, the percentage under it is how often hands took that branch, and circles are new cards. The busiest line runs straight across; the others drop off below it. Boxes are where hands ended: filled for a showdown, empty when everyone else folded.</span></div>
+    <div class="l"></div>
+    <div class="l q"><h3>IS IT REALLY LIVE?</h3></div>
+    <div class="l a"><span>Yes. Worker processes on the server play hands the whole time, and each finished hand is pushed to this page as it happens. Pause only stops your copy of the book; the bots keep playing and the hands queue up.</span></div>
+    <div class="l"></div>
+    <div class="l q"><h3>HOW DO THE BOTS DECIDE?</h3></div>
+    <div class="l a"><span>MONTE rolls out random boards for its equity and reads it off two power curves: the most it will call and the most it will bet. CFR-7 solved a small version of every street ahead of time by counterfactual regret minimisation and samples from that mix. NASH plays the textbook ratios: bluffs in proportion to its bet size, defends to minimum defence frequency, never adjusts to anyone.</span></div>
+    <div class="l"></div>
+    <div class="l c"><span>*** END OF PRINTOUT ***</span></div>
+  </section>
+</div>
+</main>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
