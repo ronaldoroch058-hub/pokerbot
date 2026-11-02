@@ -2,6 +2,8 @@
 
 Three no-limit hold'em bots playing each other, live, with a page to watch them on.
 
+![The opening book filling up as the bots play](docs/opening-book.gif)
+
 ```
 python3 -m pokerbot          # then open http://localhost:8000
 ```
